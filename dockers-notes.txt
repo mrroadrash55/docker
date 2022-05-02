@@ -1,0 +1,325 @@
+DOCKERS
+
+
+-->install
+https://docs.docker.com.zh.xy2401.com/v17.09/engine/installation/linux/centos/
+
+->sudo yum -y update
+->sudo yum install -y docker
+->docker (help cmd)
+->docker info
+->sudo service docker start / systemctl start docker
+->docker info
+->to add user to docker--->sudo usermod -a -G docker ec2-user
+->docker images --->to view image in local machine
+->docker ps --->list out running containers
+->docker ps -a -->to list all containers
+->docker run hello-world -->it will create a image from lib --docker hub
+->docker ps -a
+->sudo service docker stop
+->yum remove docker
+
+COMMAND:
+
+BASICS:
+->docker version --->show information of client and server
+->docker -v  ----> version 
+->docker info --->docker is installed on your system
+->docker --help or docker images --help
+->docker login --->docker hub login 
+
+-> to reduce the size of the name in hostname in terminal
+  export PS1="\u$"
+
+IMAGES:
+->docker images----->list of all images
+  docker images -q ---->shows only image id
+->docker pull 
+  docker pull ubuntu
+->docker rmi ---->remove 
+  docker rmi -f --> force remove
+
+CONTAINERS:
+-->docker run -it ubuntu docker ps -a
+ ----->it will start run the ubuntu
+-->docker ps --->to view the container
+-->docker start aada10b6a1a8----->to start the container
+-->docker stop aada10b6a1a8
+
+SYSTEM:
+-> docker stats --->details on the running containers memory usuage and input and output.
+-> docker system df -->disk usuage
+-> docker system prune ------->remove unused data
+
+
+---------------------------------------------------------------------------------------
+DOCKER IMAGES:
+
+->Docker images are templates used to create Docker containers
+
+->images can be stored at local or remote location (eg:docker hub)
+
+->docker pull <images> or docker pull ubuntu:18.04 ---tag
+
+docker run -it ubuntu bash
+
+->docker inspect <image> -----> to view the details of image
+----------------------------------------------------------------------------------------------
+DOCKER CONTAINERS:
+
+->Container is a running instance of Docker images
+
+->docker run hello-world
+->docker ps -a --->it shows the all containers running
+->docker run --name MyUbuntu1 -it ubuntu
+
+->docker start <container id or name>
+->docker stop <container id or name>
+
+->docker pause <container id or name>
+->docker unpause <container id or name>
+
+->docker top <container id or name>
+->docker stats <container id or name>
+
+->docker attach <container id or name>   
+
+->docker history <container id or name>
+
+-pull
+-run
+-start
+-----------------------------------------------------------------------------------------------------
+
+HOW TO RUN JENKINS ON DOCKER CONTAINER:
+
+
+first need image ---docker hub --->cmd
+->docker pull jenkins
+->docker run -p 8080(physical machine port):8080 -p 50000(container port):50000 jenkins -----------it stored the workspace in /var/jenkins_home
+or
+->docker run -p 8080:8080 -p 50000:50000 -v /your/home:/var/jenkins_home <image_name:version>  -------(recommened)it will store the data in /your/home ---if we delete the the container all data will be stored in that file 
+or
+->docker ps -----to view container is running or not
+->docker start (id or name)
+
+CREATE A DOCKER VOLUME:
+
+->docker volume create myjenkins---myjenkins is docker volume name
+->docker volume ls
+->docker volume inspect myjenkins ----it shows the path and details
+->docker run --name myjenkins2 -p 9090:8080 -p 50000:50000 -v (myjenkins):/var/jenkins_home jenkins ---myjenkins is docker volume name
+->docker inspect myjenkins2 ------it shows container details ---in that mount we can see docker volume
+
+to run in backgound: [ -d ]
+
+docker run -d --rm -p 8000:80 -p 8443:443 --name pandorafms pandorafms/pandorafms:latest
+
+
+----------------------------------------------------------------------------------------------------------------------
+DOCKERFILE:
+
+->Dockerfile is a simple text file with instruction to build a image.
+->Automation of Docker image creation
+
+[DOCKERFILE] --------------->[DOCKER IMAGE]
+              (docker build)
+
+
+STEP 1: Create a file named Dockerfile
+STEP 2: Add instructions in Docker file
+STEP 3: Build dockerfile to create image
+STEP 4: Run image to create container
+  
+   ->mkdir Dockerfiles
+   ->cd Dockerfiles
+   ->touch Dockerfile
+
+   ->vim Dockerfile
+       #getting base image ubuntu
+       FROM ubuntu
+    
+       MAINTAINER vijay <vijay@gmail.com>
+
+       RUN apt-get update  -------it get executed during building of the image
+
+       CMD ["echo","Hello World..!"]  -----it gets executed only when you create a container of the image
+        
+
+     ->docker build . (or) docker build /user/ec2-user/dockerfile (or) docker build -t myimage . --- -t denotes the name 
+
+     ->docker run <image_id>
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+DOCKER COMPOSE:
+
+TO INSTALL DOCKER_COMPOSE:
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+
+->tool for defining & running multi-container docker applications
+->use yaml files to configure application services(docker-compose.yml)
+->can start all services with a single command: docker compose up
+->can stop all service with a single command: docker compose down
+->can scale up selected services when required 
+
+STEP 1: install docker compose
+-> docker-compose version  ----to check 
+----->using PIP you can install docker-compose
+->pip install -U docker-compose
+
+STEP 2:create docker compose file at any location on your system----docker-compose.yml
+->mkdir compose
+->cd compose
+->touch docker-compose.yml
+->vim docker-compose.yml
+    version:'3'
+    services:
+
+        web:
+          image: nginx
+        database:
+          image: redis
+
+STEP 3: Check the validity of file ny command 
+->docker-compose config
+
+STEP 4:  Run docker-compose.yml file by command
+->docker-compose up -d
+
+STEP 5: Bring down application by command
+->docker-compose down
+-----------------------------------------------------------
+
+->docker ps
+->docker-compose down
+
+TO RUN IN PORT -->vim docker-compose.yml
+
+                 add port below
+                image: nginx
+                ports:
+                  - 9090:80
+
+     
+----------------------------------------------------------------
+HOW TO SCALE SERVICE:
+
+--scale tag
+
+--->docker-compose up -d --scale database=4
+->docker ps
+   it will create 1 nginx and 4 database
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ sudo docker logs -f bb0cf097fa2d ---------log
+
+ sudo docker exec -it bb0cf097fa2d /bin/bash --------to get into container
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ CONTAINER
+
+->LAyers of images
+->mostly linux base image,because small in size
+->application image on top 
+
+
+
+docker exec -it(interactive terminal) <id> /bin/bash ----get into the container
+env  -----to print in container
+
+
+docker logs <id> --- to view the log
+
+docker run -----it create a new container
+docker start ----to restart a stopped container
+-------------------------------------------------
+integrating same containers with docker network:
+
+docker network
+
+docker network create <name> ----to create a new network
+
+created two mongodb and integrated into one container::: 
+
+TO RUN the docker with docker network:  (see environment variable)
+1: 
+ docker run -d(detach) \
+>-p 27017:27017 \
+>-e(environment) MONGO_INITDB_ROOT_USERNAME=admin \
+>-e MONGO_INITDB_ROOT_PASSWORD=password \
+>--name mongodb
+>---net mongo-network \       -------------------docker network
+>mongo      ----start a container
+
+---> check log
+2:
+ docker run -d \
+>-p 8081:8081 \
+>-e ME_CONFIG_MONGODB_ADMINUSERNAME=admin \
+>-e ME_CONFIG_MONGODB_ADMINPASWORD=password \
+>--net mongo-network
+>--name mongo-express \
+>-e ME_CONFIG_MONGODB_SERVER=mongodb  ----------first created container name
+>mongo-express
+
+--->check log
+
+DOCKER-COMPOSE.YAML
+
+version:'3'   ----version
+services:   
+  mongodb:    ----name
+     image:mongo  ----image
+     ports:
+       -27017:27017
+     environment:
+       -MONGO.._USERNAME=admin
+
+
+-----------
+COMPOSE.yml
+
+version: '3'
+services:
+ mongodb:
+   image: mongo
+   ports:
+    - 27017:27017
+   environment:
+    - MONGO_INIT...USERNAME=admin
+    - MONGO_INIT...PASSWD=password
+ mongo-express:
+   image: mongo-express
+   ports:
+    - 8081:8081
+   environment:
+    - ME_CONFIG_MONGO....USERNAME=admin
+    - ME_CONFIG_MONGO....PASSWORD=password
+    - ME_CONFIG_MONGO_SERVER=mongodb   
+
+-->RUN: docker-compose -f mongo.yaml up 
+
+  it will create default network
+
+->docker-compose -f mongo.yaml down 
+
+
+-------------------------
+DOCKERFILE
+
+dockerfile is a blueprint for creating docker images.
+
+->docker build -t my-app:1.0 
+
+to get into the folder of image
+->docker exec -it <image id> /bin/sh
